@@ -1,59 +1,55 @@
+const axios = require("axios");
+const fs = require("fs");
+const { exec } = require("child_process");
+
 module.exports.config = {
-	name: "tikvideo",
-	version: "1.0.0",
-	hasPermssion: 0,
-	credits: "𝐏𝐫𝐢𝐲𝐚𝐧𝐬𝐡 𝐑𝐚𝐣𝐩𝐮𝐭",
-	description: "Download tiktok video",
-	commandCategory: "For user",
-	usages: "",
-	cooldowns: 5
-}, module.exports.onLoad = function() {
-	console.log("===TIKTOK DOWNLOAD NO WATERMARK===")
-}, module.exports.run = async function({ args,event,	api }) {
-  const axios = require("axios");
-  const fs = require("fs-extra");
-    const request = require("request");
-  var img = [];
-  if(!args[0]){
-    return api.sendMessage(`No content entered`,event.threadID, event.messageID)
-  }
-  const res = (await axios.get(`http://api.leanhtruong.net/api-no-key/tiktok?url=${encodeURI(args[0])}`)).data
-   let imga = (await axios.get(res.thumbail , { responseType: "arraybuffer" } )).data; 
-         fs.writeFileSync(__dirname + "/cache/tiktok.png", Buffer.from(imga, "utf-8") );
-         img.push(fs.createReadStream(__dirname + "/cache/tiktok.png"));
-  var msg = {body: `Title: ${res.title}\nAuthor : ${res.author_video}\nTitle Music : ${res.data_music.title}\n\n1.Download Videos\n2.Download Music\n\nReply message to choose!`,attachment: img}
-  return api.sendMessage(msg, event.threadID, (error, info) => {
-        global.client.handleReply.push({
-            type: "reply",
-            name: this.config.name,
-            author: event.senderID,
-            messageID: info.messageID,
-            video: res.data_nowatermark[0].url,
-            mp3: res.data_music.url,
-            title: res.title,
-          authorvd: res.author_video,
-          text : res.data_music.title
-        })
-    }) 
-}
-module.exports.handleReply = async function ({ args, event, Users, Currencies, api, handleReply }) {
- const axios = require("axios");
-  const fs = require("fs-extra");
-    const request = require("request");
-    let { author, video,mp3, title,authorvd, text  , messageID } = handleReply;
-    if (event.senderID != author) return api.sendMessage("Rác ?", event.threadID, event.messageID); 
-    switch(handleReply.type) {
-        case "reply": {
-        switch(event.body){
-          case"1":{
-            var callback = () => api.sendMessage({body:`VIDEO : ${authorvd}\nTitle : ${title}\n`,attachment: fs.createReadStream(__dirname + "/cache/toptop.mp4")}, event.threadID, () => fs.unlinkSync(__dirname + "/cache/toptop.mp4"),event.messageID);
-return request(encodeURI(`${video}`)).pipe(fs.createWriteStream(__dirname+'/cache/toptop.mp4')).on('close',() => callback());     
-          }
-            case"2":{
-            var callback = () => api.sendMessage({body:`Song: ${text}`,attachment: fs.createReadStream(__dirname + "/cache/toptop.m4a")}, event.threadID, () => fs.unlinkSync(__dirname + "/cache/toptop.m4a"),event.messageID);
-return request(encodeURI(`${mp3}`)).pipe(fs.createWriteStream(__dirname+'/cache/toptop.m4a')).on('close',() => callback());     
-          }
-        }
-        }
+  name: "tiktok",
+  credits: "PRINCE MALHOTRA",
+  hasPermission: 0,
+  description: "TikTok से वीडियो डाउनलोड करें",
+  usages: "[कीवर्ड/लिंक]",
+  commandCategory: "media",
+  cooldowns: 5
+};
+
+module.exports.run = async ({ event, args, api }) => {
+  try {
+    if (args.length === 0) {
+      return api.sendMessage("कृपया कोई कीवर्ड या TikTok वीडियो लिंक दें!", event.threadID, event.messageID);
     }
-                                                                                                                                     }
+
+    let query = args.join(" ");
+    let searchURL = `https://prince-sir-all-in-one-api.vercel.app/api/search/tiktoksearch?q=${encodeURIComponent(query)}`;
+
+    let searchResponse = await axios.get(searchURL);
+    if (!searchResponse.data.result || searchResponse.data.result.length === 0) {
+      return api.sendMessage("कोई वीडियो नहीं मिला!", event.threadID, event.messageID);
+    }
+
+    let videoData = searchResponse.data.result[0]; // पहला वीडियो चुनें
+    let videoURL = videoData.play; // बिना वॉटरमार्क वाला लिंक
+    let videoTitle = videoData.title || "TikTok Video";
+
+    let filePath = `./tiktok_${event.senderID}.mp4`;
+    let writer = fs.createWriteStream(filePath);
+
+    let videoStream = await axios({
+      url: videoURL,
+      method: "GET",
+      responseType: "stream"
+    });
+
+    videoStream.data.pipe(writer);
+
+    writer.on("finish", () => {
+      api.sendMessage({
+        body: `🎥 ${videoTitle}`,
+        attachment: fs.createReadStream(filePath)
+      }, event.threadID, () => fs.unlinkSync(filePath), event.messageID);
+    });
+
+  } catch (error) {
+    console.error(error);
+    api.sendMessage("⚠️ वीडियो डाउनलोड करने में समस्या हुई!", event.threadID, event.messageID);
+  }
+};
