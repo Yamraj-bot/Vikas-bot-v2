@@ -3,7 +3,7 @@ module.exports.config = {
 	name: "loveyouto",
     version: "1.0.1",
 	hasPermssion: 0,
-	credits: "𝓥𝓲𝓴𝓪𝓼 𝓡𝓪𝓳𝓹𝓾𝓽", 
+	credits: "MrTomXxX", 
 	description: "hihihihi",
 	commandCategory: "no prefix",
 	usages: "tea",
