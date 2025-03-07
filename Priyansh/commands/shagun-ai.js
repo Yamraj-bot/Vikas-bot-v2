@@ -30,7 +30,9 @@ const handleEvent = async function ({ api, event, client, __GLOBAL }) {
         const ris = await axios.get(`https://api.dreaded.site/api/chatgpt?text=${encodedText}`);
         const resultai = ris.data.result.prompt;
 
-        api.sendMessage(`${resultai}\n\n\n༺═─────────═༻\n\n༺═─────────═༻`, threadID);
+        api.sendMessage(`${resultai}\n\n\n┎───────────┑
+ ❘ 𝒞𝑟𝑒𝑑𝑖𝑡𝑠 »𝓥𝓲𝑘𝓪𝑠 𝓡𝓪𝑝𝓾𝓽 🤍
+┗───────────┙\n\n🧡🤍💚▬▬▬▬▬▬🧡🤍💚`, threadID);
       } catch (err) {
         console.error(err);
         api.sendMessage("❌ 𝑁𝑜 𝑟𝑒𝑠𝑝𝑜𝑛𝑠𝑒 𝑟𝑒𝑐𝑒𝑖𝑣𝑒𝑑 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒➤𝑠𝑒𝑟𝑣𝑒𝑟 : " + err + "🥺", threadID);
