@@ -22,7 +22,7 @@ const handleEvent = async function ({ api, event, client, __GLOBAL }) {
       api.sendMessage("✨ 𝗛𝗲𝗹𝗹𝗼 𝗶 𝗮𝗺 𝗦𝗵𝗮𝗴𝘂𝗻🦋, 𝙏𝙮𝙥 ➤ 𝙎𝙝𝙖𝙜𝙪𝙣 𝙖𝙣𝙙 𝙖𝙨𝙠 𝙮𝙤𝙪𝙧 𝙦𝙪𝙚𝙩𝙞𝙤𝙣'𝙨", threadID);
     } else {
       try {
-        api.sendMessage("🫶🏻...", threadID);
+        api.sendMessage("🔎...", threadID);
 
         const text = message.slice(1).join(" "); // Join the remaining parts of the message
         const encodedText = encodeURIComponent(text);
